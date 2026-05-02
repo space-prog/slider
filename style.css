@@ -1,0 +1,33 @@
+body {
+    margin: 0;
+}
+
+.flex {
+    display: grid;
+    grid-auto-flow: column;
+    gap: 1vw;
+    transform: translateX(-44vw);
+    transition: all .5s ease;
+}
+
+.item {
+    width: 21.5vw;
+}
+
+.item img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.fixed {
+    width: 90vw;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+a {
+    font-size: 50px;
+    text-decoration: none;
+    padding-right: 30px;
+}
