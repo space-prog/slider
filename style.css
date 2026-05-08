@@ -6,12 +6,13 @@ body {
     display: grid;
     grid-auto-flow: column;
     gap: 1vw;
-    transform: translateX(-44vw);
-    transition: all .5s ease;
+    /* transform прибраний — JS сам виставляє початкову позицію */
+    transition: transform .5s ease;
 }
 
 .item {
     width: 21.5vw;
+    height: 60vh; /* додав висоту, бо без неї img не відображається нормально */
 }
 
 .item img {
