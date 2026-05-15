@@ -1,53 +1,57 @@
-const slides = [...document.querySelectorAll(".item")]
-const flex = document.getElementById("flex")
-const btnLeft = document.getElementById("left")
-const btnRight = document.getElementById("right")
-const slideW = 22.5
-const len = slides.length
+const track = document.getElementById('flex')
+const btnL = document.getElementById('left')
+const btnR = document.getElementById('right')
 
-;[...slides].reverse().forEach(slide => {
-    flex.insertBefore(slide.cloneNode(true), flex.firstChild)
-})
+const SLIDE_W = 22.5
+const GAP = 0.3
+const STEP = SLIDE_W + GAP
 
-slides.forEach(slide => {
-    flex.appendChild(slide.cloneNode(true))
-})
-
-let current = len
 let isAnimating = false
+let direction = null
 
-flex.style.transition = "none"
-flex.style.transform = `translateX(-${current * slideW}vw)`
 
-function goTo(index, animate) {
-    flex.style.transition = animate ? "transform .5s ease" : "none"
-    flex.style.transform = `translateX(-${index * slideW}vw)`
-    current = index
+
+function getSlides() {
+  return [...track.querySelectorAll('.item')]
 }
 
-btnRight.addEventListener("click", (e) => {
-    e.preventDefault()
-    if (isAnimating) return
-    isAnimating = true
-    goTo(current + 1, true)
+function setPos(vw, animate) {
+  track.style.transition = animate
+    ? 'transform 0.45s ease'
+    : 'none'
+  track.style.transform = `translateX(${vw}vw)`
+}
+
+setPos(0, false)
+
+btnR.addEventListener('click', (e) => {
+  e.preventDefault()
+  if (isAnimating) return
+  isAnimating = true
+  direction = 'right'
+  setPos(-STEP, true)
 })
 
-btnLeft.addEventListener("click", (e) => {
-    e.preventDefault()
-    if (isAnimating) return
-    isAnimating = true
-    goTo(current - 1, true)
+btnL.addEventListener('click', (e) => {
+  e.preventDefault()
+  if (isAnimating) return
+  isAnimating = true
+  direction = 'left'
+  setPos(STEP, true)
 })
 
-flex.addEventListener("transitionend", (e) => {
-    if (e.propertyName !== "transform") return
+track.addEventListener('transitionend', (e) => {
+  if (e.propertyName !== 'transform') return
 
-    if (current >= len * 2) {
-        goTo(current - len, false)
-    }
-    if (current < len) {
-        goTo(current + len, false)
-    }
+  const slides = getSlides()
 
-    isAnimating = false
+  if (direction === 'right') {
+    track.appendChild(slides[0])
+  } else {
+    track.insertBefore(slides[slides.length - 1], slides[0])
+  }
+
+  setPos(0, false)
+  direction = null
+  isAnimating = false
 })
