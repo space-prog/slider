@@ -3,61 +3,55 @@ const btnL = document.getElementById('left')
 const btnR = document.getElementById('right')
 
 const SLIDE_W = 22.5
-const GAP = 0.3
-const STEP = SLIDE_W + GAP
+const items = [...track.querySelectorAll('.item')]
+const itemsLength = items.length
 
 let isAnimating = false
-let direction = null
+let idx = 0
 
-function getSlides() {
-  return [...track.querySelectorAll('.item')]
-}
 
-const items = getSlides()
-
-let cloneFirst = items[0].cloneNode(true)
-let cloneLast = items[items.length - 1].cloneNode(true)
-
-track.appendChild(cloneFirst, items[items.length - 1])
-track.insertBefore(cloneLast, items[0])
-
-function setPos(vw, animate) {
-  track.style.transition = animate
-    ? 'transform 0.45s ease'
-    : 'none'
-  track.style.transform = `translateX(${vw}vw)`
-}
-
-setPos(-22.5, false)
-
-btnR.addEventListener('click', (e) => {
-  e.preventDefault()
-  if (isAnimating) return
-  isAnimating = true
-  direction = 'right'
-  setPos(-STEP * 2, true)
-})
-
-btnL.addEventListener('click', (e) => {
-  e.preventDefault()
-  if (isAnimating) return
-  isAnimating = true
-  direction = 'left'
-  setPos(STEP, true)
-})
-
-track.addEventListener('transitionend', (e) => {
-  if (e.propertyName !== 'transform') return
-
-  const slides = getSlides()
-
-  if (direction === 'right') {
-    track.appendChild(slides[0])
-  } else {
-    track.insertBefore(slides[slides.length - 1], slides[0])
+function updateSlider() {
+  while(track.firstChild) {
+    track.removeChild(track.firstChild)
   }
+  const firstClone = items[itemsLength - 1].cloneNode(true)
+  const lastClone = items[0].cloneNode(true)
+  firstClone.style.left = `${-SLIDE_W}vw`
+  lastClone.style.left = `${SLIDE_W * itemsLength}vw`
+  track.insertAdjacentElement('afterbegin', firstClone)
+  track.appendChild(lastClone)
 
-  setPos(-22.5, false)
-  direction = null
-  isAnimating = false
+  for(let i = 0; i<itemsLength; i++) {
+    let item = items[i].cloneNode(true)
+    item.style.left = `${SLIDE_W * i}vw`
+    track.appendChild(item)
+  }
+}
+
+function gotoIndex(index) {
+  isAnimating = true
+  let distance = -index * SLIDE_W
+  idx = (idx + itemsLength + index) / itemsLength
+  track.style.transition = "all .5s ease"
+  track.style.transform = `translateX(${distance}vw)`
+  setTimeout(() => {
+    track.style.transform = "none"
+    track.style.transition = "none"
+    isAnimating = false
+    updateSlider()
+  }, 500)
+}
+
+btnL.addEventListener("click", function(e) {
+  e.preventDefault()
+  items.unshift(items.pop())
+  gotoIndex(-1)
 })
+
+btnR.addEventListener("click", function(e) {
+  e.preventDefault()
+  items.push(items.shift())
+  gotoIndex(1)
+})
+
+updateSlider()
